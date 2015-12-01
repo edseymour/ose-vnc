@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenShift NoVNC 
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStartPre=/bin/sh -c "/bin/echo -n HOSTIP=$(/bin/hostname -i) > /etc/hostip.env"
+EnvironmentFile=/etc/hostip.env
+ExecStart=/usr/bin/docker run --env HOSTPORT=${HOSTIP}:5900 --name ose-vnc -p 443:6080 edseymour/ose-vnc
+ExecStop=/usr/bin/docker stop -t 2 ose-vnc ; /usr/bin/docker rm -f ose-vnc
+
+[Install]
+WantedBy=local.target
